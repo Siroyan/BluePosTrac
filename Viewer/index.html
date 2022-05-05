@@ -33,7 +33,7 @@
       </section>
       <section class="p-4 bg-light">
         <div class="container">
-          <div class="input-group mb-3">
+          <div class="input-group">
             <span class="input-group-text" id="inputGroup-sizing-default">TxPower</span>
             <input type="number" id="tx-power-input" value="0.0" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default">
             <span class="input-group-text" id="inputGroup-sizing-default">dBm</span>
@@ -56,8 +56,8 @@
                 event.manufacturerData.forEach((valueDataView, key) => {
                   let rssi = event.rssi;
                   let dist = 10 ** ((txPower - rssi) / 20);
-                  document.getElementById("rssi").innerHTML = Math.round(rssi * 100) / 100 + " dBm";
-                  document.getElementById("dist").innerHTML = Math.round(dist / 1000) + " m";
+                  document.getElementById("rssi").innerHTML = Math.round(rssi * 1000) / 1000 + " dBm";
+                  document.getElementById("dist").innerHTML = Math.round(dist / 100) / 10 + " m";
                 });
               }
             );
