@@ -22,7 +22,10 @@
     <main>
       <section class="p-4 bg-white">
         <div class="p-2 container text-center">
-          <dvi id="temp" class="h1">0.00 dBm</dvi>
+          <dvi id="dist" class="h1">0.00 m</dvi>
+        </div>
+        <div class="p-2 container text-center">
+          <dvi id="rssi" class="h5 text-secondary">0.00 dBm</dvi>
         </div>
         <div class="p-4 container text-center">
           <button class="btn btn-lg btn-success" onclick="onButtonClick();">Scan</button>
@@ -30,6 +33,7 @@
       </section>
     </main>
     <script>
+      const txPower = 4;
       async function onButtonClick() {
         await navigator.bluetooth
           .requestLEScan({
@@ -42,7 +46,9 @@
               (event) => {
                 event.manufacturerData.forEach((valueDataView, key) => {
                   let rssi = event.rssi;
-                  document.getElementById("temp").innerHTML = Math.round(rssi * 100) / 100 + " dBm";
+                  let dist = 10 ** ((txPower - rssi) / 20);
+                  document.getElementById("rssi").innerHTML = Math.round(rssi * 100) / 100 + " dBm";
+                  document.getElementById("dist").innerHTML = Math.round(dist * 100) / 100 + " m";
                   console.log(packet);
                 });
               }
