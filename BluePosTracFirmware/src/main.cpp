@@ -1,35 +1,35 @@
 #include <Arduino.h>
 #include <bluefruit.h>
 
-#define MANUFACTURER_ID   0x0059
-
-uint8_t beaconUuid[16] = {
-  0x01, 0x12, 0x23, 0x34, 0x45, 0x56, 0x67, 0x78,
-  0x89, 0x9a, 0xab, 0xbc, 0xcd, 0xde, 0xef, 0xf0
-};
-
-BLEBeacon beacon(beaconUuid, 0x0102, 0x0304, -54);
-
-void startAdv(void) {  
-  Bluefruit.Advertising.setBeacon(beacon);
-  Bluefruit.ScanResponse.addName();
+void startAdv(void) {   
+  Bluefruit.Advertising.addFlags(BLE_GAP_ADV_FLAGS_LE_ONLY_GENERAL_DISC_MODE);
+  Bluefruit.Advertising.setType(BLE_GAP_ADV_TYPE_NONCONNECTABLE_SCANNABLE_UNDIRECTED);
+  struct ATTR_PACKED
+  {
+    uint16_t manufacturer;
+    uint8_t sensor_len;
+    uint16_t sensor_type;
+    uint8_t sensor_values[4];
+  } sensor_data =
+  {
+    .manufacturer = 0x0822,
+    .sensor_len = sizeof(sensor_data) - 3,
+    .sensor_type = 0x0000,
+    .sensor_values = {0, 1, 2, 3},
+  };
+  Bluefruit.Advertising.addData(BLE_GAP_AD_TYPE_MANUFACTURER_SPECIFIC_DATA, &sensor_data, sizeof(sensor_data));
+  Bluefruit.Advertising.addName();
   Bluefruit.Advertising.restartOnDisconnect(true);
-  Bluefruit.Advertising.setInterval(160, 160);    // in unit of 0.625 ms
-  Bluefruit.Advertising.setFastTimeout(30);      // number of seconds in fast mode
-  Bluefruit.Advertising.start(0);                // 0 = Don't stop advertising after n seconds  
+  Bluefruit.Advertising.setInterval(200, 200);
+  Bluefruit.Advertising.setFastTimeout(0);
+  Bluefruit.Advertising.start(0);
 }
 
 void setup() {
-  Serial.begin(115200);
-  while ( !Serial ) delay(10);
-  Serial.println("Bluefruit52 Beacon Example");
-  Serial.println("--------------------------\n");
   Bluefruit.begin();
   Bluefruit.autoConnLed(false);
-  Bluefruit.setTxPower(0);    // Check bluefruit.h for supported values
-  beacon.setManufacturer(MANUFACTURER_ID);
+  Bluefruit.setTxPower(4);
   startAdv();
-  Serial.println("Broadcasting beacon, open your beacon app to test");
   suspendLoop();
 }
 
